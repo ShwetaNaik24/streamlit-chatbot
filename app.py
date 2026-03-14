@@ -4,7 +4,6 @@ import json
 import csv
 import pandas as pd
 from datetime import datetime
-from fpdf import FPDF
 from streamlit_mic_recorder import mic_recorder
 
 # ---------------- SETTINGS ----------------
@@ -95,7 +94,7 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # AI status
+    # AI Status
     st.subheader("🤖 AI Status")
 
     try:
@@ -172,26 +171,6 @@ with st.sidebar:
             chat_text,
             file_name="chat.txt"
         )
-
-    # Export PDF
-    if st.button("📄 Export Chat PDF"):
-
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-
-        for msg in st.session_state.messages:
-            text = f"{msg['role']}: {msg['content']}"
-            pdf.cell(200,10,txt=text,ln=True)
-
-        pdf.output("chat.pdf")
-
-        with open("chat.pdf","rb") as f:
-            st.download_button(
-                "Download PDF",
-                f,
-                file_name="chat.pdf"
-            )
 
     st.markdown("---")
 
