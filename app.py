@@ -9,7 +9,30 @@ N8N_WEBHOOK = "https://shwetanaik24.app.n8n.cloud/webhook/ca5071d2-6190-438e-85e
 
 st.set_page_config(page_title="AI Assistant", page_icon="🤖", layout="wide")
 
-st.title("🤖 AI Assistant")
+# ---------------- LOGIN / LOCK SYSTEM ----------------
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+def login():
+    if username == "admin" and password == "1234":
+        st.session_state.logged_in = True
+        st.success("Login successful")
+        st.rerun()
+    else:
+        st.error("Invalid credentials")
+
+if not st.session_state.logged_in:
+
+    st.title("🔐 AI Assistant Login")
+
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        login()
+
+    st.stop()
 
 # ---------------- LOG SYSTEM ----------------
 
@@ -30,6 +53,8 @@ if "messages" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = []
 
+st.title("🤖 AI Assistant")
+
 # ---------------- SIDEBAR ----------------
 
 with st.sidebar:
@@ -39,8 +64,9 @@ with st.sidebar:
     if st.button("➕ New Chat"):
         if st.session_state.messages:
             st.session_state.history.append(st.session_state.messages)
+
         st.session_state.messages = []
-        add_log("New chat created")
+        add_log("New chat started")
         st.rerun()
 
     for i, chat in enumerate(st.session_state.history):
@@ -60,7 +86,9 @@ with st.sidebar:
 
     # Download chat
     if st.session_state.messages:
+
         chat_text = ""
+
         for msg in st.session_state.messages:
             chat_text += f"{msg['role']}: {msg['content']}\n"
 
@@ -74,18 +102,19 @@ with st.sidebar:
 
     st.write("📊 Total messages:", len(st.session_state.messages))
 
-    # File Upload
+    # File upload
     uploaded_file = st.file_uploader("📎 Upload file", type=["txt","pdf","csv"])
 
     if uploaded_file:
+
         add_log(f"File uploaded: {uploaded_file.name}")
 
-        response = requests.post(
+        requests.post(
             N8N_WEBHOOK,
             files={"file": uploaded_file}
         )
 
-        st.success("File sent to AI!")
+        st.success("File sent to AI")
 
     st.markdown("---")
 
@@ -93,12 +122,13 @@ with st.sidebar:
     st.header("📜 Activity Logs")
 
     if st.session_state.logs:
-        log_df = pd.DataFrame(st.session_state.logs)
-        st.dataframe(log_df)
+        df = pd.DataFrame(st.session_state.logs)
+        st.dataframe(df)
 
 # ---------------- SHOW CHAT ----------------
 
 for msg in st.session_state.messages:
+
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
@@ -133,16 +163,19 @@ if prompt:
             )
 
             for line in response.text.splitlines():
+
                 try:
                     data = json.loads(line)
+
                     if data.get("type") == "item":
                         bot_reply += data.get("content", "")
                         placeholder.markdown(bot_reply)
+
                 except:
                     pass
 
         except Exception as e:
-            bot_reply = f"⚠ Error: {e}"
+            bot_reply = f"Error: {e}"
 
         placeholder.markdown(bot_reply)
 
