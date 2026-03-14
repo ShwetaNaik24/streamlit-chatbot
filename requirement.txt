@@ -1,4 +1,4 @@
 streamlit
 requests
 pandas
-streamlit-mic-recorder
+streamlit-mic-recorder==0.0.8
