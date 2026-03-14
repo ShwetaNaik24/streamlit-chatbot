@@ -1,5 +1,5 @@
 streamlit
 requests
 pandas
+fpdf2
 streamlit-mic-recorder
-fpdf
